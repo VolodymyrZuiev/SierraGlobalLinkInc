@@ -154,7 +154,7 @@
     email: (v) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v),
     tel: (v) => v.replace(/[^\d]/g, '').length >= 7,
   };
-  const bindForm = (form, onSent) => {
+  const bindForm = (form, onSent, extraCheck) => {
     if (!form) return;
     form.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -162,7 +162,7 @@
       $$('[required]', form).forEach((input) => {
         const field = input.closest('.field');
         const v = input.value.trim();
-        const check = validators[input.type];
+        const check = input.name === 'captcha' ? extraCheck : validators[input.type];
         const ok = v.length > 0 && (!check || check(v));
         field.classList.toggle('is-invalid', !ok);
         if (!ok) valid = false;
@@ -187,21 +187,59 @@
     const modalForm = $('#quoteModalForm', modal);
     let lastFocus = null;
 
+    /* Simple arithmetic challenge (client-side).
+       For production, replace with Cloudflare Turnstile or reCAPTCHA and verify the token server-side. */
+    const captchaQ = $('#captchaQ');
+    const captchaInput = $('input[name="captcha"]', modalForm);
+    let captchaAnswer = 0;
+    const newCaptcha = () => {
+      const a = 2 + Math.floor(Math.random() * 8);
+      const b = 1 + Math.floor(Math.random() * 9);
+      const plus = Math.random() > 0.4 || a <= b;
+      captchaAnswer = plus ? a + b : a - b;
+      if (captchaQ) captchaQ.textContent = `${a} ${plus ? '+' : '−'} ${b} = ?`;
+      if (captchaInput) {
+        captchaInput.value = '';
+        captchaInput.closest('.field')?.classList.remove('is-invalid');
+      }
+    };
+    $('#captchaRefresh')?.addEventListener('click', newCaptcha);
+    const checkCaptcha = (v) => Number(v.replace(/\s/g, '')) === captchaAnswer;
+
     const openModal = (trigger) => {
       if (modal.open) return;
       lastFocus = trigger || document.activeElement;
       if (links?.classList.contains('is-open')) closeMenu();
+      modal.classList.remove('is-closing');
+      newCaptcha();
       modal.showModal();
-      document.body.classList.add("modal-open");
-      requestAnimationFrame(() => $('input, select, textarea', modalForm)?.focus({ preventScroll: true }));
+      document.body.classList.add('modal-open');
+      // Focus the first field only on desktop — on phones the keyboard would cover the sheet.
+      if (window.matchMedia('(min-width: 901px)').matches) {
+        setTimeout(() => $('input, select, textarea', modalForm)?.focus({ preventScroll: true }), 350);
+      }
     };
     const closeModal = () => {
-      if (!modal.open) return;
-      modal.close();
+      if (!modal.open || modal.classList.contains('is-closing')) return;
+      if (reduceMotion) return modal.close();
+      modal.classList.add('is-closing');
+      const panel = $('.modal__panel', modal);
+      const finish = () => {
+        modal.classList.remove('is-closing');
+        modal.close();
+      };
+      panel.addEventListener('animationend', finish, { once: true });
+      setTimeout(finish, 400); // safety net
     };
 
+    // Native ESC / cancel: play the exit animation instead of snapping shut.
+    modal.addEventListener('cancel', (e) => {
+      e.preventDefault();
+      closeModal();
+    });
     modal.addEventListener('close', () => {
-      document.body.classList.remove("modal-open");
+      modal.classList.remove('is-closing');
+      document.body.classList.remove('modal-open');
       if (modalForm.classList.contains('is-sent')) {
         modalForm.reset();
         modalForm.classList.remove('is-sent');
@@ -221,7 +259,29 @@
       })
     );
 
-    bindForm(modalForm, () => setTimeout(closeModal, 3200));
+    bindForm(modalForm, () => setTimeout(closeModal, 3200), checkCaptcha);
+  }
+
+  /* ---------- Cookie consent ---------- */
+  const cookie = $('#cookie');
+  if (cookie) {
+    const KEY = 'sgl-cookie-consent';
+    let stored = null;
+    try { stored = localStorage.getItem(KEY); } catch {}
+    if (!stored) {
+      cookie.hidden = false;
+      setTimeout(() => cookie.classList.add('is-visible'), 1600);
+    }
+    $$('[data-cookie]', cookie).forEach((b) =>
+      b.addEventListener('click', () => {
+        const choice = b.dataset.cookie;
+        try { localStorage.setItem(KEY, choice); } catch {}
+        document.cookie = `sgl_consent=${choice}; max-age=${60 * 60 * 24 * 180}; path=/; SameSite=Lax`;
+        cookie.classList.remove('is-visible');
+        setTimeout(() => (cookie.hidden = true), 500);
+        // TODO: initialise analytics here when choice === 'all'.
+      })
+    );
   }
 
   /* ---------- Misc ---------- */

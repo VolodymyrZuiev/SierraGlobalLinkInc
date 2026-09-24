@@ -283,37 +283,31 @@
           <div class="service__icon"><svg class="ic"><use href="#i-plane"/></svg></div>
           <h3>Air Freight</h3>
           <p>Express, consolidated and charter solutions with airport-to-door coordination and priority handling for time-critical cargo.</p>
-          <span class="service__arrow"><svg class="ic"><use href="#i-arrow"/></svg></span>
         </article>
         <article class="service" data-reveal style="--i:1">
           <div class="service__icon"><svg class="ic"><use href="#i-ship"/></svg></div>
           <h3>Ocean Freight</h3>
           <p>FCL, LCL, reefer and out-of-gauge on the lanes that matter to your business — with space secured before peak season hits.</p>
-          <span class="service__arrow"><svg class="ic"><use href="#i-arrow"/></svg></span>
         </article>
         <article class="service" data-reveal style="--i:2">
           <div class="service__icon"><svg class="ic"><use href="#i-truck"/></svg></div>
           <h3>Ground &amp; Cross-Border</h3>
           <p>FTL, LTL, intermodal and drayage across North America, coordinated with your international legs as one plan.</p>
-          <span class="service__arrow"><svg class="ic"><use href="#i-arrow"/></svg></span>
         </article>
         <article class="service" data-reveal style="--i:3">
           <div class="service__icon"><svg class="ic"><use href="#i-shield"/></svg></div>
           <h3>Customs Brokerage &amp; Compliance</h3>
           <p>Classification, filings, duty optimization and regulatory checks — handled by specialists before the cargo moves.</p>
-          <span class="service__arrow"><svg class="ic"><use href="#i-arrow"/></svg></span>
         </article>
         <article class="service" data-reveal style="--i:4">
           <div class="service__icon"><svg class="ic"><use href="#i-doc"/></svg></div>
           <h3>Documentation &amp; Insurance</h3>
           <p>Bills of lading, certificates, letters of credit and cargo coverage, prepared right the first time and archived in your portal.</p>
-          <span class="service__arrow"><svg class="ic"><use href="#i-arrow"/></svg></span>
         </article>
         <article class="service" data-reveal style="--i:5">
           <div class="service__icon"><svg class="ic"><use href="#i-warehouse"/></svg></div>
           <h3>Warehousing &amp; Distribution</h3>
           <p>Consolidation, deconsolidation, storage and last-mile from strategically located hubs — scaled to your volume.</p>
-          <span class="service__arrow"><svg class="ic"><use href="#i-arrow"/></svg></span>
         </article>
       </div>
     </div>
@@ -575,14 +569,9 @@
 
     <aside class="modal__side">
       <svg class="modal__mark" viewBox="56 15 145 165" fill="currentColor" aria-hidden="true"><use href="#logo-mark"/></svg>
-      <p class="eyebrow eyebrow--light"><span class="eyebrow__dot"></span> Request a quote</p>
-      <h2 class="modal__title" id="quoteTitle">Tell us about the shipment.</h2>
-      <p class="modal__lead">Lane, cargo, timing — that's enough to start. A named team member replies with routing options and pricing within one business day.</p>
-      <ul class="modal__steps">
-        <li><span>01</span>We review your lane and cargo details</li>
-        <li><span>02</span>You get routing options with landed cost</li>
-        <li><span>03</span>Book — and meet your dedicated team</li>
-      </ul>
+      <p class="eyebrow eyebrow--light"><span class="eyebrow__dot"></span> Get a quote</p>
+      <h2 class="modal__title" id="quoteTitle">Leave your contacts — we'll call you back.</h2>
+      <p class="modal__lead">A named team member replies within one business day with routing options and pricing.</p>
       <div class="modal__contact">
         <a href="mailto:info@sierragloballink.com"><svg class="ic"><use href="#i-mail"/></svg> info@sierragloballink.com</a>
         <a href="tel:+18000000000"><svg class="ic"><use href="#i-phone"/></svg> +1 (800) 000-0000</a>
@@ -590,19 +579,17 @@
     </aside>
 
     <form class="form form--modal" id="quoteModalForm" novalidate>
-      <div class="form__row">
-        <label class="field">
-          <span>Full name *</span>
-          <input type="text" name="name" required autocomplete="name" placeholder="Jane Cooper" />
-        </label>
-        <label class="field">
-          <span>Company</span>
-          <input type="text" name="company" autocomplete="organization" placeholder="Acme Industries" />
-        </label>
+      <div class="modal__head">
+        <p class="eyebrow"><span class="eyebrow__dot"></span> Get a quote</p>
+        <h2 class="modal__title modal__title--form">Leave your contacts — we'll call you back.</h2>
       </div>
+      <label class="field">
+        <span>Full name *</span>
+        <input type="text" name="name" required autocomplete="name" placeholder="Jane Cooper" />
+      </label>
       <div class="form__row">
         <label class="field">
-          <span>Work email *</span>
+          <span>Email *</span>
           <input type="email" name="email" required autocomplete="email" placeholder="jane@company.com" />
         </label>
         <label class="field">
@@ -610,65 +597,47 @@
           <input type="tel" name="phone" required autocomplete="tel" placeholder="+1 (555) 000-0000" />
         </label>
       </div>
-      <div class="form__row form__row--3">
-        <label class="field">
-          <span>Mode *</span>
-          <select name="mode" required>
-            <option value="">Select…</option>
-            <option>Air</option>
-            <option>Ocean — FCL</option>
-            <option>Ocean — LCL</option>
-            <option>Land / Cross-border</option>
-            <option>Multimodal</option>
-            <option>Not sure yet</option>
-          </select>
-        </label>
-        <label class="field">
-          <span>Origin</span>
-          <input type="text" name="origin" placeholder="Shanghai, CN" />
-        </label>
-        <label class="field">
-          <span>Destination</span>
-          <input type="text" name="destination" placeholder="Chicago, US" />
-        </label>
-      </div>
-      <div class="form__row form__row--3">
-        <label class="field">
-          <span>Cargo type</span>
-          <select name="cargo">
-            <option value="">Select…</option>
-            <option>General cargo</option>
-            <option>Palletized</option>
-            <option>Containerized</option>
-            <option>Temperature-controlled</option>
-            <option>Hazardous (DG)</option>
-            <option>Oversized / Project</option>
-          </select>
-        </label>
-        <label class="field">
-          <span>Weight / volume</span>
-          <input type="text" name="volume" placeholder="e.g. 12 pallets · 4,800 kg" />
-        </label>
-        <label class="field">
-          <span>Ready date</span>
-          <input type="date" name="ready" />
-        </label>
-      </div>
       <label class="field">
-        <span>Your question or details</span>
-        <textarea name="message" rows="3" placeholder="Incoterms, frequency, special handling, deadlines…"></textarea>
+        <span>Your question</span>
+        <textarea name="message" rows="3" placeholder="What are you moving, and where?"></textarea>
       </label>
+
+      <!-- Simple client-side challenge. For production, swap for Cloudflare Turnstile / reCAPTCHA (see js/main.js). -->
+      <div class="captcha field" id="captcha">
+        <span>Security check *</span>
+        <div class="captcha__row">
+          <span class="captcha__q" id="captchaQ" aria-live="polite">3 + 4 = ?</span>
+          <input type="text" inputmode="numeric" name="captcha" required autocomplete="off" placeholder="Answer" aria-label="Answer the security question" />
+          <button type="button" class="captcha__refresh" id="captchaRefresh" aria-label="New question">
+            <svg class="ic" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+          </button>
+        </div>
+      </div>
+
       <div class="form__foot">
         <button type="submit" class="btn btn--lg">Request a Quote <svg class="ic"><use href="#i-arrow"/></svg></button>
-        <p class="form__note">Fields marked * are required. We reply within one business day.</p>
+        <p class="form__note">By sending you agree to our <a href="#">Privacy Policy</a>.</p>
       </div>
       <div class="form__success" aria-live="polite">
         <svg class="ic"><use href="#i-check"/></svg>
-        <div><strong>Request received.</strong><span>Your dedicated team member will reach out within one business day with routing options and pricing.</span></div>
+        <div><strong>Request received.</strong><span>Your dedicated team member will reach out within one business day.</span></div>
       </div>
     </form>
   </div>
 </dialog>
+
+<!-- ========== COOKIE CONSENT ========== -->
+<div class="cookie" id="cookie" role="dialog" aria-live="polite" aria-label="Cookie consent" hidden>
+  <div class="cookie__icon"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5Z"/><circle cx="8.5" cy="10.5" r=".8"/><circle cx="12" cy="15.5" r=".8"/><circle cx="16" cy="13" r=".8"/></svg></div>
+  <div class="cookie__text">
+    <strong>We use cookies.</strong>
+    <span>Essential cookies keep the site working; analytics cookies help us improve it. Read our <a href="#">Cookie Policy</a>.</span>
+  </div>
+  <div class="cookie__actions">
+    <button type="button" class="btn btn--sm btn--outline" data-cookie="essential">Essential only</button>
+    <button type="button" class="btn btn--sm" data-cookie="all">Accept all</button>
+  </div>
+</div>
 
 <!-- ========== FOOTER ========== -->
 <footer class="footer">
