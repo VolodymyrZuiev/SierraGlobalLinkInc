@@ -149,28 +149,79 @@
     });
   }
 
-  /* ---------- Quote form (front-end only) ---------- */
-  const form = $('#quoteForm');
-  if (form) {
+  /* ---------- Forms (front-end only) ---------- */
+  const validators = {
+    email: (v) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v),
+    tel: (v) => v.replace(/[^\d]/g, '').length >= 7,
+  };
+  const bindForm = (form, onSent) => {
+    if (!form) return;
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       let valid = true;
       $$('[required]', form).forEach((input) => {
         const field = input.closest('.field');
-        const ok = input.type === 'email' ? /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(input.value) : input.value.trim().length > 0;
+        const v = input.value.trim();
+        const check = validators[input.type];
+        const ok = v.length > 0 && (!check || check(v));
         field.classList.toggle('is-invalid', !ok);
         if (!ok) valid = false;
       });
       if (!valid) {
-        $('.is-invalid input, .is-invalid textarea', form)?.focus();
+        $('.is-invalid input, .is-invalid textarea, .is-invalid select', form)?.focus();
         return;
       }
       // TODO: connect to a backend / form service (e.g. Formspree, HubSpot, custom API).
       form.classList.add('is-sent');
+      if (onSent) onSent();
     });
-    $$('input, textarea', form).forEach((input) =>
+    $$('input, textarea, select', form).forEach((input) =>
       input.addEventListener('input', () => input.closest('.field').classList.remove('is-invalid'))
     );
+  };
+  bindForm($('#quoteForm'));
+
+  /* ---------- Get a Quote modal ---------- */
+  const modal = $('#quoteModal');
+  if (modal) {
+    const modalForm = $('#quoteModalForm', modal);
+    let lastFocus = null;
+
+    const openModal = (trigger) => {
+      if (modal.open) return;
+      lastFocus = trigger || document.activeElement;
+      if (links?.classList.contains('is-open')) closeMenu();
+      modal.showModal();
+      document.body.classList.add("modal-open");
+      requestAnimationFrame(() => $('input, select, textarea', modalForm)?.focus({ preventScroll: true }));
+    };
+    const closeModal = () => {
+      if (!modal.open) return;
+      modal.close();
+    };
+
+    modal.addEventListener('close', () => {
+      document.body.classList.remove("modal-open");
+      if (modalForm.classList.contains('is-sent')) {
+        modalForm.reset();
+        modalForm.classList.remove('is-sent');
+      }
+      lastFocus?.focus?.({ preventScroll: true });
+    });
+
+    // Backdrop click closes; clicks inside the panel don't.
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+    $$('[data-quote-close]', modal).forEach((b) => b.addEventListener('click', closeModal));
+    $$('[data-quote]').forEach((b) =>
+      b.addEventListener('click', (e) => {
+        e.preventDefault();
+        openModal(b);
+      })
+    );
+
+    bindForm(modalForm, () => setTimeout(closeModal, 3200));
   }
 
   /* ---------- Misc ---------- */
