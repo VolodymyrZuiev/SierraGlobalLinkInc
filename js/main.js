@@ -154,16 +154,43 @@
     email: (v) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v),
     tel: (v) => v.replace(/[^\d]/g, '').length >= 7,
   };
-  const bindForm = (form, onSent, extraCheck) => {
-    if (!form) return;
+  /* Simple arithmetic challenge (client-side).
+     For production, replace with Cloudflare Turnstile or reCAPTCHA and verify the token server-side. */
+  const setupCaptcha = (form) => {
+    const box = $('[data-captcha]', form);
+    if (!box) return { refresh: () => {}, check: () => true };
+    const q = $('[data-captcha-q]', box);
+    const input = $('input[name="captcha"]', box);
+    let answer = 0;
+    const refresh = () => {
+      const a = 2 + Math.floor(Math.random() * 8);
+      const b = 1 + Math.floor(Math.random() * 9);
+      const plus = Math.random() > 0.4 || a <= b;
+      answer = plus ? a + b : a - b;
+      q.textContent = `${a} ${plus ? '+' : '−'} ${b} = ?`;
+      input.value = '';
+      box.classList.remove('is-invalid');
+    };
+    $('[data-captcha-refresh]', box).addEventListener('click', refresh);
+    refresh();
+    return { refresh, check: (v) => Number(v.replace(/\s/g, '')) === answer };
+  };
+
+  const bindForm = (form, onSent) => {
+    if (!form) return null;
+    const captcha = setupCaptcha(form);
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       let valid = true;
       $$('[required]', form).forEach((input) => {
         const field = input.closest('.field');
         const v = input.value.trim();
-        const check = input.name === 'captcha' ? extraCheck : validators[input.type];
-        const ok = v.length > 0 && (!check || check(v));
+        let ok;
+        if (input.type === 'checkbox') ok = input.checked;
+        else {
+          const check = input.name === 'captcha' ? captcha.check : validators[input.type];
+          ok = v.length > 0 && (!check || check(v));
+        }
         field.classList.toggle('is-invalid', !ok);
         if (!ok) valid = false;
       });
@@ -175,9 +202,12 @@
       form.classList.add('is-sent');
       if (onSent) onSent();
     });
-    $$('input, textarea, select', form).forEach((input) =>
-      input.addEventListener('input', () => input.closest('.field').classList.remove('is-invalid'))
-    );
+    $$('input, textarea, select', form).forEach((input) => {
+      const clear = () => input.closest('.field').classList.remove('is-invalid');
+      input.addEventListener('input', clear);
+      input.addEventListener('change', clear);
+    });
+    return captcha;
   };
   bindForm($('#quoteForm'));
 
@@ -186,32 +216,14 @@
   if (modal) {
     const modalForm = $('#quoteModalForm', modal);
     let lastFocus = null;
-
-    /* Simple arithmetic challenge (client-side).
-       For production, replace with Cloudflare Turnstile or reCAPTCHA and verify the token server-side. */
-    const captchaQ = $('#captchaQ');
-    const captchaInput = $('input[name="captcha"]', modalForm);
-    let captchaAnswer = 0;
-    const newCaptcha = () => {
-      const a = 2 + Math.floor(Math.random() * 8);
-      const b = 1 + Math.floor(Math.random() * 9);
-      const plus = Math.random() > 0.4 || a <= b;
-      captchaAnswer = plus ? a + b : a - b;
-      if (captchaQ) captchaQ.textContent = `${a} ${plus ? '+' : '−'} ${b} = ?`;
-      if (captchaInput) {
-        captchaInput.value = '';
-        captchaInput.closest('.field')?.classList.remove('is-invalid');
-      }
-    };
-    $('#captchaRefresh')?.addEventListener('click', newCaptcha);
-    const checkCaptcha = (v) => Number(v.replace(/\s/g, '')) === captchaAnswer;
+    let modalCaptcha = null;
 
     const openModal = (trigger) => {
       if (modal.open) return;
       lastFocus = trigger || document.activeElement;
       if (links?.classList.contains('is-open')) closeMenu();
       modal.classList.remove('is-closing');
-      newCaptcha();
+      modalCaptcha?.refresh();
       modal.showModal();
       document.body.classList.add('modal-open');
       // Focus the first field only on desktop — on phones the keyboard would cover the sheet.
@@ -259,7 +271,7 @@
       })
     );
 
-    bindForm(modalForm, () => setTimeout(closeModal, 3200), checkCaptcha);
+    modalCaptcha = bindForm(modalForm, () => setTimeout(closeModal, 3200));
   }
 
   /* ---------- Cookie consent ---------- */
